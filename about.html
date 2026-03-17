@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TN BUILDERS - About Us</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root { 
+            --primary: #0d47a1; 
+            --accent: #ffb300; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { background: #010409; color: #fff; overflow-x: hidden; }
+
+        /* Smooth Video BG */
+        .video-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        .video-bg video { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.25); }
+
+        header { 
+            background: rgba(13, 71, 161, 0.8); backdrop-filter: blur(15px);
+            padding: 15px 0; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid var(--border);
+        }
+        .container { max-width: 1200px; margin: auto; padding: 0 20px; }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo img { height: 38px; border-radius: 6px; background: #fff; padding: 2px; box-shadow: 0 0 15px rgba(255,179,0,0.4); }
+        .logo h1 { color: var(--accent); font-size: 1.2em; letter-spacing: 2px; }
+
+        nav ul { display: flex; list-style: none; gap: 8px; align-items: center; }
+        nav ul li a { 
+            color: #cbd5e1; text-decoration: none; font-weight: 600; padding: 10px 18px; 
+            border-radius: 12px; font-size: 0.85em; transition: 0.3s; text-transform: uppercase; 
+        }
+        nav ul li a:hover, nav ul li a.current { background: var(--glass); color: var(--accent); }
+
+        /* Main Content */
+        #about-page { padding: 60px 0; perspective: 1000px; }
+        .section-title { text-align: center; margin-bottom: 50px; }
+        .section-title h2 { font-size: 2.2em; color: #fff; letter-spacing: 3px; text-transform: uppercase; }
+        .section-title hr { width: 60px; height: 4px; background: var(--accent); border: none; margin: 15px auto; border-radius: 2px; }
+
+        .about-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: start; }
+
+        /* 3D Glass Cards */
+        .glass-card { 
+            background: var(--glass); backdrop-filter: blur(20px);
+            padding: 45px; border-radius: 35px; border: 1px solid var(--border);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); transform-style: preserve-3d;
+            transition: 0.4s;
+        }
+        .glass-card:hover { border-color: var(--accent); }
+
+        .glass-card h3 { color: var(--accent); font-size: 1.8em; margin-bottom: 25px; transform: translateZ(30px); }
+        .glass-card p { color: #94a3b8; font-size: 1.05em; line-height: 1.8; transform: translateZ(20px); }
+
+        .feature-list { list-style: none; margin: 30px 0; transform: translateZ(40px); }
+        .feature-list li { margin-bottom: 18px; display: flex; align-items: center; font-weight: 600; color: #e2e8f0; }
+        .feature-list i { color: var(--accent); margin-right: 15px; font-size: 1.2em; }
+
+        /* 3D Form Card */
+        .contact-card { 
+            background: linear-gradient(135deg, rgba(13, 71, 161, 0.4), rgba(0,0,0,0.6));
+            padding: 40px; border-radius: 35px; border: 1px solid var(--border);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6); transform-style: preserve-3d;
+        }
+
+        .whatsapp-btn { 
+            display: flex; align-items: center; justify-content: center; background: #25d366; 
+            color: white; text-decoration: none; padding: 18px; border-radius: 15px; 
+            font-weight: 800; margin-bottom: 30px; transition: 0.3s; transform: translateZ(50px);
+        }
+        .whatsapp-btn:hover { transform: translateZ(60px) scale(1.03); filter: brightness(1.1); }
+
+        .form-group { margin-bottom: 20px; transform: translateZ(30px); }
+        .form-group label { color: var(--accent); font-size: 0.8em; font-weight: bold; margin-bottom: 8px; display: block; }
+        .form-group input, .form-group textarea { 
+            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border); color: #fff; outline: none; transition: 0.3s;
+        }
+        .form-group input:focus { border-color: var(--accent); background: rgba(0,0,0,0.5); }
+
+        .submit-btn { 
+            width: 100%; padding: 18px; background: var(--accent); color: var(--primary); 
+            border: none; border-radius: 12px; font-weight: 900; cursor: pointer;
+            text-transform: uppercase; letter-spacing: 1px; transform: translateZ(40px);
+            transition: 0.4s;
+        }
+        .submit-btn:hover { background: #fff; transform: translateZ(50px) scale(1.02); }
+
+        /* Founder 3D Section */
+        .founder-box { 
+            background: var(--glass); backdrop-filter: blur(20px);
+            padding: 40px; border-radius: 40px; text-align: center; max-width: 450px; 
+            margin: 80px auto; border: 1px solid var(--border); position: relative;
+            transform-style: preserve-3d;
+        }
+        .founder-box::before {
+            content: ''; position: absolute; inset: -2px; border-radius: 42px;
+            background: linear-gradient(45deg, transparent, var(--accent), transparent);
+            z-index: -1;
+        }
+        .founder-box img { 
+            width: 160px; height: 160px; border-radius: 30px; border: 4px solid var(--accent); 
+            margin-bottom: 25px; object-fit: cover; transform: translateZ(50px) rotate(-5deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .founder-info h4 { font-size: 1.5em; color: #fff; transform: translateZ(30px); }
+        .founder-info p { color: var(--accent); font-weight: bold; margin-top: 5px; transform: translateZ(20px); }
+
+        footer { text-align: center; padding: 40px; color: #64748b; font-size: 0.9em; border-top: 1px solid var(--border); }
+
+        @media (max-width: 850px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .section-title h2 { font-size: 1.7em; }
+        }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+    <div class="video-bg">
+        <video autoplay muted loop playsinline><source src="static/videos/run.mp4" type="video/mp4"></video>
+    </div>
+
+    <header>
+        <div class="container header-flex">
+            <a href="index.html" class="logo">
+               <img src="https://firebasestorage.googleapis.com/v0/b/tn-builders.firebasestorage.app/o/site-brand-logo.png?alt=media" id="main-logo" alt="Logo">
+                <h1>TN BUILDERS</h1>
+            </a>
+            <nav>
+                <ul id="nav-list">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="work.html">Projects</a></li>
+                    <li><a href="about.html" class="current">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main id="about-page" class="container">
+        <div class="section-title" data-aos="fade-down">
+            <h2>Heritage of Excellence</h2>
+            <hr>
+        </div>
+
+        <div class="about-grid">
+            <div class="glass-card" data-tilt data-tilt-max="5">
+                <h3>Our Vision</h3>
+                <p>Establishing benchmarks in the construction industry through unwavering commitment to structural integrity and architectural brilliance.</p>
+                
+                <ul class="feature-list">
+                    <li><i class="fas fa-microchip"></i> Advanced 3D Visualization</li>
+                    <li><i class="fas fa-file-contract"></i> Legal Approval Experts (DTCP/LP)</li>
+                    <li><i class="fas fa-hard-hat"></i> Premium Material Selection</li>
+                    <li><i class="fas fa-pencil-ruler"></i> Custom Interior Curation</li>
+                </ul>
+
+                <div style="background: rgba(13, 71, 161, 0.3); padding: 25px; border-radius: 20px; border-left: 5px solid var(--accent);">
+                    <p style="color: #fff; font-size: 0.9em;"><i class="fas fa-map-marker-alt" style="color:var(--accent)"></i> Headquarters: Poolampatti, Salem.</p>
+                    <p style="color: #fff; font-size: 0.9em; margin-top:10px;"><i class="fas fa-network-wired" style="color:var(--accent)"></i> Serving across Tamil Nadu.</p>
+                </div>
+            </div>
+
+            <div class="contact-card" data-tilt data-tilt-glare data-tilt-max-glare="0.2">
+                <a href="https://wa.me/+918778950074" target="_blank" class="whatsapp-btn">
+                    <i class="fab fa-whatsapp" style="margin-right:12px; font-size:1.5em;"></i> DIRECT CONSULTATION
+                </a>
+
+                <form action="https://api.web3forms.com/submit" method="POST">
+                    <input type="hidden" name="access_key" value="1b8cc04f-4742-462b-8f73-eff4081bce7c">
+                    <div class="form-group">
+                        <label>FULL NAME</label>
+                        <input type="text" name="name" placeholder="E.g. John Doe" required>
+                    </div>
+                    <div class="form-group">
+                        <label>PHONE NUMBER</label>
+                        <input type="tel" name="phone" placeholder="+91 XXXX XXXX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>REQUIREMENTS</label>
+                        <textarea name="message" rows="3" placeholder="Describe your dream project..." required></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">SEND ENQUIRY</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="founder-box" data-aos="flip-up" data-tilt>
+            <img src="static/images/photo.jpeg" alt="Founder">
+            <div class="founder-info">
+                <h4>Er. T. Nithyanandhan</h4>
+                <p>M.E., M.B.A. | Structural Consultant</p>
+                <div style="margin-top:15px; color: #94a3b8; font-size: 0.85em;">Revolutionizing construction with scientific precision and modern aesthetics.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 TN BUILDERS | Built for the Future.</p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        AOS.init({ duration: 1000 });
+        VanillaTilt.init(document.querySelectorAll("[data-tilt]"));
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrhSxPhLxbWctFRHl8XpvUPW8XMOxHiEk",
+            authDomain: "tn-builders.firebaseapp.com",
+            projectId: "tn-builders",
+            storageBucket: "tn-builders.firebasestorage.app",
+            messagingSenderId: "1092380469105",
+            appId: "1:1092380469105:web:1cf22fb0d8ea44171f38d0",
+            measurementId: "G-8638X3B19X"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        const ADMIN_EMAILS = ["santhoshwebworker@gmail.com", "tnbuilders.designs@gmail.com"];
+
+        // Update navigation based on auth state
+        auth.onAuthStateChanged((user) => {
+            const list = document.getElementById('nav-list');
+            
+            // Clear any existing dynamic items
+            const existingChip = document.querySelector('.user-profile-chip');
+            if (existingChip) existingChip.remove();
+            
+            if (user) {
+                const email = user.email;
+                const isAdmin = ADMIN_EMAILS.includes(email);
+                
+                const chip = document.createElement('li');
+                chip.innerHTML = `
+                    <div class="user-profile-chip">${email.split('@')[0]}</div>
+                `;
+                list.appendChild(chip);
+                
+                if (isAdmin) {
+                    const adminLink = document.createElement('li');
+                    adminLink.innerHTML = '<a href="admin_dashboard.html" style="background:linear-gradient(45deg, gold, orange); color:#000; border:none;">ADMIN PANEL</a>';
+                    list.appendChild(adminLink);
+                }
+                
+                const logoutLink = document.createElement('li');
+                logoutLink.innerHTML = '<a href="#" onclick="logout()" style="color:#ef5350">Logout</a>';
+                list.appendChild(logoutLink);
+            } else {
+                const loginLink = document.createElement('li');
+                loginLink.innerHTML = '<a href="login.html" style="background:var(--accent); color:var(--primary);">Login</a>';
+                list.appendChild(loginLink);
+            }
+        });
+
+        window.logout = async function() {
+            await auth.signOut();
+            window.location.reload();
+        };
+    </script>
+</body>
+</html>

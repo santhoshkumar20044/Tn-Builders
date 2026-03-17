@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TN BUILDERS - Premium Admin Panel</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        :root { 
+            --primary: #0d47a1; 
+            --accent: #ffb300; 
+            --bg: #0f172a; 
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e293b, #0f172a); 
+            color: #e2e8f0; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar & Layout */
+        .sidebar { 
+            width: var(--sidebar-width); 
+            height: 100vh; 
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            position: fixed; 
+            left: 0; top: 0; z-index: 1000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-header { padding: 30px; text-align: center; }
+        .sidebar-header h2 { color: var(--accent); font-size: 1.4em; letter-spacing: 2px; }
+
+        .nav-links { list-style: none; padding: 20px 15px; }
+        .nav-links a { 
+            color: #94a3b8; text-decoration: none; display: flex; align-items: center; 
+            padding: 15px; border-radius: 12px; margin-bottom: 8px; transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { background: var(--glass); color: var(--accent); }
+
+        .main-wrapper { margin-left: var(--sidebar-width); width: calc(100% - var(--sidebar-width)); transition: 0.4s; }
+        
+        .top-nav { 
+            background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(10px);
+            padding: 0 30px; display: flex; justify-content: space-between; align-items: center; 
+            height: 80px; border-bottom: 1px solid var(--glass-border);
+        }
+
+        .admin-info { background: var(--accent); color: var(--primary); padding: 10px 20px; border-radius: 12px; font-weight: 900; }
+
+        .dashboard-container { padding: 40px; }
+        
+        /* Cards & Forms */
+        .admin-card { 
+            background: var(--glass); border-radius: 24px; padding: 35px; 
+            border: 1px solid var(--glass-border); margin-bottom: 40px;
+        }
+        .admin-card h2 { font-size: 1.3em; margin-bottom: 25px; color: var(--accent); display: flex; align-items: center; gap: 15px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 10px; font-size: 0.8em; color: #94a3b8; font-weight: bold; }
+        .form-group input, .form-group textarea { 
+            width: 100%; padding: 15px; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; outline: none;
+        }
+        
+        .btn-publish { 
+            background: linear-gradient(45deg, var(--primary), #1e40af); 
+            color: white; border: none; padding: 18px; border-radius: 15px; 
+            font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase;
+        }
+        .btn-logo-update { background: linear-gradient(45deg, #ffb300, #ff8f00); color: #000; }
+
+        .projects-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        .projects-table td { padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .delete-btn { color: #ef4444; cursor: pointer; }
+
+        @media (max-width: 850px) {
+            .sidebar { left: -100%; }
+            .sidebar.active { left: 0; }
+            .main-wrapper { margin-left: 0; width: 100%; }
+        }
+    </style>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header"><h2>TN BUILDERS</h2></div>
+        <ul class="nav-links">
+            <li><a href="#" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="index.html"><i class="fas fa-globe"></i> Visit Website</a></li>
+            <li><a href="work.html"><i class="fas fa-project-diagram"></i> View Projects</a></li>
+            <li style="margin-top: 50px;"><a href="#" onclick="logout()" style="color: #ef5350;"><i class="fas fa-power-off"></i> Sign Out</a></li>
+        </ul>
+    </div>
+
+    <div class="main-wrapper">
+        <div class="top-nav">
+            <div id="toggle-btn" style="cursor:pointer; font-size: 1.5em;"><i class="fas fa-align-left"></i></div>
+            <div class="admin-info" id="admin-email">Loading Admin...</div>
+        </div>
+
+        <div class="dashboard-container">
+            <!-- Logo Update Section -->
+            <div class="admin-card" data-aos="fade-up">
+                <h2><i class="fas fa-image"></i> Website Branding</h2>
+                <div class="form-group">
+                    <label>Update Website Logo (PNG Recommended)</label>
+                    <input type="file" id="site_logo" accept="image/*">
+                </div>
+                <button class="btn-publish btn-logo-update" onclick="updateLogo()" id="logo-btn">Update Brand Logo</button>
+            </div>
+
+            <!-- Add New Project Section -->
+            <div class="admin-card" data-aos="fade-up">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Publish New Work</h2>
+                <form id="project-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="form-group"><label>Project Title</label><input type="text" id="title" required></div>
+                        <div class="form-group"><label>Client Name</label><input type="text" id="client" required></div>
+                    </div>
+                    <div class="form-group"><label>Project Summary</label><textarea id="description" rows="3"></textarea></div>
+                    
+                    <!-- PDF Upload Fields -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                        <div class="form-group"><label>Floor Plan PDF</label><input type="file" id="floor_pdf" accept=".pdf"></div>
+                        <div class="form-group"><label>Electrical PDF</label><input type="file" id="ele_pdf" accept=".pdf"></div>
+                        <div class="form-group"><label>Plumbing PDF</label><input type="file" id="plumb_pdf" accept=".pdf"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn-publish" id="submit-btn">Upload to Server</button>
+                </form>
+            </div>
+
+            <!-- Projects List -->
+            <div class="admin-card" data-aos="fade-up">
+                <h2><i class="fas fa-list"></i> Existing Projects</h2>
+                <div id="projects-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        AOS.init({ duration: 800 });
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrhSxPhLxbWctFRHl8XpvUPW8XMOxHiEk",
+            authDomain: "tn-builders.firebaseapp.com",
+            projectId: "tn-builders",
+            storageBucket: "tn-builders.firebasestorage.app",
+            messagingSenderId: "1092380469105",
+            appId: "1:1092380469105:web:1cf22fb0d8ea44171f38d0",
+            measurementId: "G-8638X3B19X"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const ADMIN_EMAILS = ["santhoshwebworker@gmail.com", "tnbuilders.designs@gmail.com"];
+
+        // Check Admin Access
+        auth.onAuthStateChanged(async (user) => {
+            if (!user || !ADMIN_EMAILS.includes(user.email)) {
+                window.location.href = 'login.html';
+            } else {
+                document.getElementById('admin-email').innerText = "Logged in: " + user.email;
+                loadProjects();
+            }
+        });
+
+        // Load existing projects
+        async function loadProjects() {
+            const container = document.getElementById('projects-list');
+            
+            try {
+                const snapshot = await db.collection('projects')
+                    .orderBy('created_at', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    container.innerHTML = '<p style="color:#94a3b8;">No projects yet.</p>';
+                    return;
+                }
+
+                let html = '<table class="projects-table">';
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${p.title || 'Untitled'}</strong><br>
+                                <small>Client: ${p.client || 'N/A'}</small>
+                            </td>
+                            <td>
+                                <i class="fas fa-trash delete-btn" onclick="deleteProject('${doc.id}')"></i>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</table>';
+                container.innerHTML = html;
+            } catch (error) {
+                console.error("Error loading projects:", error);
+            }
+        }
+
+        // Update Logo Function
+        async function updateLogo() {
+            const fileInput = document.getElementById('site_logo');
+            const file = fileInput.files[0];
+            const btn = document.getElementById('logo-btn');
+            
+            if (!file) return alert("Please select a logo file!");
+
+            btn.innerText = "Processing & Uploading...";
+            btn.disabled = true;
+
+            try {
+                const storageRef = storage.ref();
+                const logoRef = storageRef.child('site-brand-logo.png');
+                
+                await logoRef.put(file);
+                const downloadURL = await logoRef.getDownloadURL();
+
+                alert("Logo updated successfully!");
+                window.location.href = 'index.html?updated=' + new Date().getTime();
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.disabled = false;
+                btn.innerText = "Update Brand Logo";
+            }
+        }
+
+        // Upload Project with PDFs
+        document.getElementById('project-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const client = document.getElementById('client').value;
+            const description = document.getElementById('description').value;
+            
+            const floorFile = document.getElementById('floor_pdf').files[0];
+            const eleFile = document.getElementById('ele_pdf').files[0];
+            const plumbFile = document.getElementById('plumb_pdf').files[0];
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.innerText = "Uploading...";
+            submitBtn.disabled = true;
+
+            try {
+                // Upload PDFs if selected
+                const uploads = {};
+                
+                if (floorFile) {
+                    const floorRef = storage.ref().child(`projects/${Date.now()}_floor.pdf`);
+                    await floorRef.put(floorFile);
+                    uploads.floor_pdf = await floorRef.getDownloadURL();
+                }
+                
+                if (eleFile) {
+                    const eleRef = storage.ref().child(`projects/${Date.now()}_ele.pdf`);
+                    await eleRef.put(eleFile);
+                    uploads.ele_pdf = await eleRef.getDownloadURL();
+                }
+                
+                if (plumbFile) {
+                    const plumbRef = storage.ref().child(`projects/${Date.now()}_plumb.pdf`);
+                    await plumbRef.put(plumbFile);
+                    uploads.plumb_pdf = await plumbRef.getDownloadURL();
+                }
+
+                // Save to Firestore
+                await db.collection('projects').add({
+                    title,
+                    client,
+                    description,
+                    ...uploads,
+                    created_at: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("Project uploaded successfully!");
+                document.getElementById('project-form').reset();
+                loadProjects();
+                
+            } catch (error) {
+                console.error("Upload error:", error);
+                alert("Error uploading project: " + error.message);
+            } finally {
+                submitBtn.innerText = "Upload to Server";
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Delete Project
+        window.deleteProject = async (projectId) => {
+            if (!confirm("Are you sure you want to delete this project?")) return;
+            
+            try {
+                await db.collection('projects').doc(projectId).delete();
+                loadProjects();
+            } catch (error) {
+                console.error("Delete error:", error);
+                alert("Error deleting project");
+            }
+        };
+
+        // Logout
+        window.logout = async function() {
+            await auth.signOut();
+            window.location.href = 'login.html';
+        };
+
+        // Toggle Sidebar
+        document.getElementById('toggle-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
